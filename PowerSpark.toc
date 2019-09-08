@@ -1,7 +1,7 @@
 ## Interface: 11302
 ## Title: 有蓝职业五秒回蓝和盗贼、小德能量恢复监视
 ## Notes: PowerSpark
-## Version: 1.0
+## Version: 1.1.0
 ## Author: 星沉海底
 ## X-Website: https://github.com/starpt
 ## X-eMail: starpt@gmail.com
