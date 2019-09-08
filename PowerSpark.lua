@@ -67,7 +67,9 @@ function PowerFrame:PowerStart(self, event, arg1)
 			end
 			lastPower = UnitPower('player', 0)
 		elseif powerType == 3 then
-			PowerFrame:PowerReply()
+			if UnitPower('player', 0) < lastPower then
+				PowerFrame:PowerReply()
+			end
 			lastPower = UnitPower('player')
 		else
 			interval = 0
