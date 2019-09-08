@@ -45,7 +45,7 @@ function PowerFrame:onEvent(self, event, arg1)
 end
 
 function PowerFrame:onUpdate()
-	if select(2, UnitClass('player')) == 'DRUID' and select(1, UnitPowerType('player')) == 1 and  DruidBarFrame then
+	if select(1, UnitPowerType('player')) == 1 and PowerFrame:Druid() then
 		mana:Hide()
 		PowerFrame:PowerSpark(druidMana, druidSpark)
 	else
@@ -57,7 +57,7 @@ end
 function PowerFrame:PowerStart(self, event, arg1)
 	if arg1 == 'player' then
 		local powerType = select(1, UnitPowerType('player'))
-		if powerType == 0 or powerType == 1 and DruidBarFrame then
+		if powerType == 0 or powerType == 1 and PowerFrame:Druid() then
 			if UnitPower('player', 0) < lastPower then
 				PowerFrame:PowerWait()
 			elseif GetTime() >= lastTime + interval then
