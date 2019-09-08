@@ -67,7 +67,7 @@ function PowerFrame:PowerStart(self, event, arg1)
 			end
 			lastPower = UnitPower('player', 0)
 		elseif powerType == 3 then
-			if UnitPower('player', 0) < lastPower then
+			if UnitPower('player') > lastPower then
 				PowerFrame:PowerReply()
 			end
 			lastPower = UnitPower('player')
@@ -114,8 +114,12 @@ function PowerFrame:PowerSpark(mana, spark) --闪动
 				end
 			else
 				local left = mana:GetWidth() * (mod(GetTime() - lastTime, interval) / interval)
-				spark:SetPoint('CENTER', mana, 'LEFT', left, 0)
-				spark:SetAlpha(.4)
+				if lastTime + interval > GetTime() then
+					spark:SetAlpha(.4)
+					spark:SetPoint('CENTER', mana, 'LEFT', left, 0)
+				else
+					spark:SetAlpha(0)
+				end
 			end
 		end
 	end

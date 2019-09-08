@@ -13,4 +13,6 @@
 
 1.1.4 修复能量使用会重置进度问题并改了Title
 
+1.1.5 修复了快速使用技能会重置进度问题
+
 https://github.com/starpt/PowerSpark
