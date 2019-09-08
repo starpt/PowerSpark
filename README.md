@@ -7,5 +7,6 @@
 
 1.1.0 版本支持DruidBarClassic插件蓝条
 1.1.2 修复人和熊形态切换5秒回蓝错乱问题
+1.1.3 修复小德蓝条报错问题
 
 https://github.com/starpt/PowerSpark

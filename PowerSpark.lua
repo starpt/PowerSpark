@@ -49,7 +49,9 @@ function PowerFrame:onUpdate()
 		mana:Hide()
 		PowerFrame:PowerSpark(druidMana, druidSpark)
 	else
-		druidMana:Hide()
+		if druidMana then
+			druidMana:Hide()
+		end
 		PowerFrame:PowerSpark(mana, spark)
 	end
 end
