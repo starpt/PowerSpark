@@ -63,8 +63,10 @@ function PowerFrame:PowerStart(self, event, arg1)
 			elseif GetTime() >= lastTime + interval then
 				PowerFrame:PowerReply()
 			end
+			lastPower = UnitPower('player', 0)
 		elseif powerType == 3 then
 			PowerFrame:PowerReply()
+			lastPower = UnitPower('player')
 		else
 			interval = 0
 		end
@@ -74,13 +76,11 @@ end
 function PowerFrame:PowerReply() --2秒回复
 	lastTime = GetTime()
 	interval = 2
-	lastPower = UnitPower('player')
 end
 
 function PowerFrame:PowerWait() --5秒回蓝
 	lastTime = GetTime()
 	interval = 5
-	lastPower = UnitPower('player', 0)
 end
 
 function PowerFrame:PowerSpark(mana, spark) --闪动
