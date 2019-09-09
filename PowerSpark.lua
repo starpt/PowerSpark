@@ -91,7 +91,7 @@ function PowerFrame:PowerSpark(mana, spark) --闪动
 	local stop
 	if select(1, UnitPowerType('player')) == 3 then --能量满
 		if UnitPower('player') >= UnitPowerMax('player') then
-			stop = true
+			stop = false
 		end
 	elseif PowerFrame:Druid(1) >= UnitPowerMax('player', 0) then
 		stop = true
@@ -102,20 +102,27 @@ function PowerFrame:PowerSpark(mana, spark) --闪动
 	if stop or interval <= 0 then
 		mana:Hide()
 	else
-		if UnitPower('player') < UnitPowerMax('player') and interval > 0 then
-			mana:Show()
-			if interval > 2 then
-				local left = mana:GetWidth() - mana:GetWidth() * (mod(GetTime() - lastTime, interval) / interval)
+		if select(1, UnitPowerType('player')) == 3 then
+			if UnitPower('player') <= UnitPowerMax('player') and interval > 0 then
+				mana:Show()
+
 				if lastTime + interval > GetTime() then
-					spark:SetAlpha(.7)
+					local left = mana:GetWidth() * (mod(GetTime() - lastTime, interval) / interval)
+
+					spark:SetAlpha(.4)
 					spark:SetPoint('CENTER', mana, 'LEFT', left, 0)
 				else
-					spark:SetAlpha(0)
+					lastTime = GetTime()
 				end
-			else
-				local left = mana:GetWidth() * (mod(GetTime() - lastTime, interval) / interval)
+			end
+		else
+			if UnitPower('player') < UnitPowerMax('player') and interval > 0 then
+				mana:Show()
+
 				if lastTime + interval > GetTime() then
-					spark:SetAlpha(.4)
+					local left = mana:GetWidth() - mana:GetWidth() * (mod(GetTime() - lastTime, interval) / interval)
+
+					spark:SetAlpha(.7)
 					spark:SetPoint('CENTER', mana, 'LEFT', left, 0)
 				else
 					spark:SetAlpha(0)
