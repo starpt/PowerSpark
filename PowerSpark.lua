@@ -1,139 +1,116 @@
 if select(2, UnitClass('player')) == 'WARRIOR' then return end
 
-local PowerFrame = CreateFrame('Frame')
-PowerFrame:RegisterEvent('PLAYER_ENTERING_WORLD')
-PowerFrame:RegisterEvent('UNIT_POWER_UPDATE')
--- PowerFrame:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED')
-PowerFrame:SetScript('OnUpdate', function() PowerFrame:onUpdate() end)
-PowerFrame:SetScript('OnEvent', function(self, event, arg1, ...) PowerFrame:onEvent(self, event, arg1, ...) end)
+local PowerSparkFrame = CreateFrame('Frame')
+PowerSparkFrame:RegisterEvent('PLAYER_ENTERING_WORLD')
+PowerSparkFrame:RegisterEvent('UNIT_POWER_UPDATE')
+PowerSparkFrame:SetScript('OnEvent', function(self, event, arg1) PowerSparkFrame:event(self, event, arg1) end)
+PowerSparkFrame:SetScript('OnUpdate', function() PowerSparkFrame:update() end)
 
-local interval = 0 --间隔
-local lastPower = 0 --次能量/法力值
-local lastTime = GetTime() --上次时间
+PowerSparkDB = PowerSparkDB or {}
+PowerSparkDB.default = {
+	name = 'PowerSparkFrameManaBar',
+	parent = PlayerFrameManaBar
+}
+PowerSparkDB.druid = {
+	name = 'PowerSparkFrameDruidManaBar',
+	parent = DruidBarFrame,
+	enable = select(2, UnitClass('player')) == 'DRUID' and DruidBarFrame and DruidBarKey --小德蓝条启用条件
+}
 
-local mana = CreateFrame('Statusbar', 'UFP_PowerManaBar', PlayerFrameManaBar)
-local spark = mana:CreateTexture(nil, 'OVERLAY')
-spark:SetTexture('Interface\\CastingBar\\UI-CastingBar-Spark')
-spark:SetWidth(32)
-spark:SetHeight(32)
-spark:SetBlendMode('ADD')
-local druidMana
-local druidSpark
-
-function PowerFrame:onEvent(self, event, arg1)
+function PowerSparkFrame:event(self, event, arg1)
 	if event == 'PLAYER_ENTERING_WORLD' then
-		lastPower = UnitPower('player', 0)
-		PowerFrame:PowerStart(self, event, arg1)
-		mana:SetWidth(PlayerFrameManaBar:GetWidth() - 2)
-		mana:SetHeight(PlayerFrameManaBar:GetHeight() - 2)
-		mana:SetPoint('CENTER')
-		if PowerFrame:Druid() then
-			druidMana = CreateFrame('Statusbar', 'UFP_PowerManaBar', DruidBarFrame)
-			druidMana:SetWidth(PlayerFrameManaBar:GetWidth() - 2)
-			druidMana:SetHeight(PlayerFrameManaBar:GetHeight() - 2)
-			druidMana:SetPoint('CENTER')
-			druidSpark = druidMana:CreateTexture(nil, 'OVERLAY')
-			druidSpark:SetTexture('Interface\\CastingBar\\UI-CastingBar-Spark')
-			druidSpark:SetWidth(32)
-			druidSpark:SetHeight(32)
-			druidSpark:SetBlendMode('ADD')
+		local last
+		if select(1, UnitPowerType('player')) == 3 then
+			last = UnitPower('player')
+		else
+			last = UnitPower('player', 0)
 		end
+		PowerSparkFrame:init(PowerSparkDB.default, last) --默认界面初始化
+		if PowerSparkDB.druid.enable then PowerSparkFrame:init(PowerSparkDB.druid, DruidBarKey.currentmana) end --小德界面初始化
 	end
-	if event == 'UNIT_POWER_UPDATE' then
-		PowerFrame:PowerStart(self, event, arg1)
-	end
-end
-
-function PowerFrame:onUpdate()
-	if select(1, UnitPowerType('player')) == 1 and PowerFrame:Druid() then
-		mana:Hide()
-		PowerFrame:PowerSpark(druidMana, druidSpark)
-	else
-		if druidMana then
-			druidMana:Hide()
-		end
-		PowerFrame:PowerSpark(mana, spark)
-	end
-end
-
-function PowerFrame:PowerStart(self, event, arg1)
-	if arg1 == 'player' then
+	if event == 'UNIT_POWER_UPDATE' and arg1 == 'player' then
 		local powerType = select(1, UnitPowerType('player'))
-		if powerType == 0 or powerType == 1 and PowerFrame:Druid() then
-			if UnitPower('player', 0) < lastPower then
-				PowerFrame:PowerWait()
-			elseif GetTime() >= lastTime + interval then
-				PowerFrame:PowerReply()
-			end
-			lastPower = UnitPower('player', 0)
-		elseif powerType == 3 then
-			if UnitPower('player') > lastPower then
-				PowerFrame:PowerReply()
-			end
-			lastPower = UnitPower('player')
+		if powerType == 3 then
+			PowerSparkFrame:energy(PowerSparkDB.default)
+		elseif powerType == 0 then
+			PowerSparkFrame:mana(PowerSparkDB.default, UnitPower('player', 0))
+		end
+		if PowerSparkDB.druid.enable then
+			PowerSparkFrame:mana(PowerSparkDB.druid, DruidBarKey.currentmana)
+		end
+	end
+end
+
+function PowerSparkFrame:update()
+	PowerSparkFrame:flash(PowerSparkDB.default)
+	if PowerSparkDB.druid.enable then PowerSparkFrame:flash(PowerSparkDB.druid) end
+end
+
+function PowerSparkFrame:init(power, last)
+	power.bar = CreateFrame('Statusbar', power.name, power.parent)
+	power.bar:SetWidth(PlayerFrameManaBar:GetWidth() - 2)
+	power.bar:SetHeight(power.parent:GetHeight() - 2)
+	power.bar:SetPoint('CENTER')
+	power.spark = power.bar:CreateTexture(nil, 'OVERLAY')
+	power.spark:SetTexture('Interface\\CastingBar\\UI-CastingBar-Spark')
+	power.spark:SetWidth(32)
+	power.spark:SetHeight(32)
+	power.spark:SetBlendMode('ADD')
+	power.spark:SetAlpha(0)
+	power.timer = power.timer or GetTime() --定时器
+	power.interval = power.interval or 2
+	power.last = last
+end
+
+function PowerSparkFrame:energy(power) --回能量
+	if UnitPower('player') > power.last and UnitPower('player') <= power.last + 20 then --不触发其它加能量方法
+		power.timer = GetTime()
+		power.interval = 2
+	end
+	power.last = UnitPower('player')
+end
+
+function PowerSparkFrame:mana(power, mp) --回蓝
+	if mp < power.last then
+		power.timer = GetTime()
+		power.interval = 5
+	elseif GetTime() >= power.timer + power.interval then
+		power.timer = GetTime()
+		power.interval = 2
+	end
+	power.last = mp
+end
+
+function PowerSparkFrame:flash(power) --闪动
+	local powerType = select(1, UnitPowerType('player'))
+	if powerType == 1 and not power.enable then  --熊的怒气槽
+		power.bar:Hide()
+	elseif powerType == 0 and UnitPower('player', 0) >= UnitPowerMax('player', 0) or power.enable and DruidBarKey.currentmana >= UnitPowerMax('player', 0) then --蓝条满
+		power.bar:Hide()
+	elseif powerType == 3 and UnitPower('player') >= UnitPowerMax('player') then
+		if UnitCanAttack('player', 'target') and not UnitIsDeadOrGhost('target') then --可攻击目标
+			power.bar:Show()
 		else
-			interval = 0
-		end
-	end
-end
-
-function PowerFrame:PowerReply() --2秒回复
-	lastTime = GetTime()
-	interval = 2
-end
-
-function PowerFrame:PowerWait() --5秒回蓝
-	lastTime = GetTime()
-	interval = 5
-end
-
-function PowerFrame:PowerSpark(mana, spark) --闪动
-	local stop
-	if select(1, UnitPowerType('player')) == 3 then --能量满
-		if UnitPower('player') >= UnitPowerMax('player') then
-			stop = true
-		end
-	elseif PowerFrame:Druid(1) >= UnitPowerMax('player', 0) then
-		stop = true
-	elseif UnitPower('player', 0) >= UnitPowerMax('player', 0) then --法力满
-		stop = true
-	end
-
-	if stop or interval <= 0 then
-		mana:Hide()
-	else
-		if UnitPower('player') < UnitPowerMax('player') and interval > 0 then
-			mana:Show()
-			if interval > 2 then
-				local left = mana:GetWidth() - mana:GetWidth() * (mod(GetTime() - lastTime, interval) / interval)
-				if lastTime + interval > GetTime() then
-					spark:SetAlpha(.7)
-					spark:SetPoint('CENTER', mana, 'LEFT', left, 0)
-				else
-					spark:SetAlpha(0)
-				end
-			else
-				local left = mana:GetWidth() * (mod(GetTime() - lastTime, interval) / interval)
-				if lastTime + interval > GetTime() then
-					spark:SetAlpha(.4)
-					spark:SetPoint('CENTER', mana, 'LEFT', left, 0)
-				else
-					spark:SetAlpha(0)
-				end
-			end
-		end
-	end
-end
-
-function PowerFrame:Druid(sort) --有小德蓝条
-	local druid = select(2, UnitClass('player')) == 'DRUID' and DruidBarFrame and DruidBarKey
-	if sort then
-		if druid then
-			return DruidBarKey.currentmana or 0
-		else
-			return 0
+			power.bar:Hide()
 		end
 	else
-		return druid
+		power.bar:Show()
+	end
+	if not power.bar:IsVisible() then return end
+
+	if power.interval > 2 then --5秒等待回蓝
+		if power.timer + power.interval > GetTime() then
+			power.spark:SetAlpha(.75)
+			power.spark:SetPoint('CENTER', power.bar, 'LEFT', power.bar:GetWidth() - power.bar:GetWidth() * (mod(GetTime() - power.timer, power.interval) / power.interval), 0)
+		else --5秒后等待恢复
+			power.spark:SetAlpha(0)
+		end
+	else
+		power.spark:SetAlpha(.5)
+		if power.timer + power.interval > GetTime() then
+			power.spark:SetPoint('CENTER', power.bar, 'LEFT', power.bar:GetWidth() * (mod(GetTime() - power.timer, power.interval) / power.interval), 0)
+		else --满能量
+			power.spark:SetPoint('CENTER', power.bar, 'LEFT', power.bar:GetWidth() * (mod(math.fmod(GetTime() - power.timer, 2), 2) / 2), 0)
+		end
 	end
 end

@@ -15,4 +15,9 @@
 
 1.1.5 修复了快速使用技能会重置进度问题
 
-https://github.com/starpt/PowerSpark
+1.1.6 修复小德猎豹形态和DruidBarClassic插件蓝条显示问题
+
+1.2.0 增加盗贼或小德猎豹形态能量满以后，有敌对目标会继续显示
+
+1.2.1 增加SavedVariablesPerCharacter: PowerSparkDB，主要保存上次恢复时间，用来计算满能量显示
+
