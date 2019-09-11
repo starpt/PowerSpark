@@ -6,15 +6,16 @@ PowerSparkFrame:RegisterEvent('UNIT_POWER_UPDATE')
 PowerSparkFrame:SetScript('OnEvent', function(self, event, arg1) PowerSparkFrame:event(self, event, arg1) end)
 PowerSparkFrame:SetScript('OnUpdate', function() PowerSparkFrame:update() end)
 
-PowerSparkDB = PowerSparkDB or {}
-PowerSparkDB.default = {
-	name = 'PowerSparkFrameManaBar',
-	parent = PlayerFrameManaBar
-}
-PowerSparkDB.druid = {
-	name = 'PowerSparkFrameDruidManaBar',
-	parent = DruidBarFrame,
-	enable = select(2, UnitClass('player')) == 'DRUID' and DruidBarFrame and DruidBarKey --小德蓝条启用条件
+local PowerSparkDB = {
+	default = {
+		name = 'PowerSparkFrameManaBar',
+		parent = PlayerFrameManaBar
+	},
+	druid = {
+		name = 'PowerSparkFrameDruidManaBar',
+		parent = DruidBarFrame,
+		enable = select(2, UnitClass('player')) == 'DRUID' and DruidBarFrame and DruidBarKey --小德蓝条启用条件
+	}
 }
 
 function PowerSparkFrame:event(self, event, arg1)

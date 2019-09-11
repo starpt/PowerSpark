@@ -21,3 +21,4 @@
 
 1.2.1 增加SavedVariablesPerCharacter: PowerSparkDB，主要保存上次恢复时间，用来计算满能量显示
 
+1.2.2 取消SavedVariablesPerCharacter: PowerSparkDB, 修复再次登录报错问题
