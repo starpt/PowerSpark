@@ -1,7 +1,7 @@
 ## Interface: 11302
 ## Title: 能量和法力恢复提示
 ## Notes: PowerSpark
-## Version: 1.2.2
+## Version: 1.2.3
 ## Author: 星沉海底
 ## X-Website: https://github.com/starpt
 ## X-eMail: starpt@gmail.com

@@ -22,3 +22,5 @@
 1.2.1 增加SavedVariablesPerCharacter: PowerSparkDB，主要保存上次恢复时间，用来计算满能量显示
 
 1.2.2 取消SavedVariablesPerCharacter: PowerSparkDB, 修复再次登录报错问题
+
+1.2.3 休复小德猎豹下回蓝停止闪动问题和传送出现双重闪动问题

@@ -1,11 +1,4 @@
 if select(2, UnitClass('player')) == 'WARRIOR' then return end
-
-local PowerSparkFrame = CreateFrame('Frame')
-PowerSparkFrame:RegisterEvent('PLAYER_ENTERING_WORLD')
-PowerSparkFrame:RegisterEvent('UNIT_POWER_UPDATE')
-PowerSparkFrame:SetScript('OnEvent', function(self, event, arg1) PowerSparkFrame:event(self, event, arg1) end)
-PowerSparkFrame:SetScript('OnUpdate', function() PowerSparkFrame:update() end)
-
 local PowerSparkDB = {
 	default = {
 		name = 'PowerSparkFrameManaBar',
@@ -17,8 +10,10 @@ local PowerSparkDB = {
 		enable = select(2, UnitClass('player')) == 'DRUID' and DruidBarFrame and DruidBarKey --小德蓝条启用条件
 	}
 }
-
-function PowerSparkFrame:event(self, event, arg1)
+local PowerSparkFrame = CreateFrame('Frame')
+PowerSparkFrame:RegisterEvent('PLAYER_ENTERING_WORLD')
+PowerSparkFrame:RegisterEvent('UNIT_POWER_UPDATE', 'player')
+PowerSparkFrame:SetScript('OnEvent', function(self, event)
 	if event == 'PLAYER_ENTERING_WORLD' then
 		local last
 		if select(1, UnitPowerType('player')) == 3 then
@@ -29,7 +24,7 @@ function PowerSparkFrame:event(self, event, arg1)
 		PowerSparkFrame:init(PowerSparkDB.default, last) --默认界面初始化
 		if PowerSparkDB.druid.enable then PowerSparkFrame:init(PowerSparkDB.druid, DruidBarKey.currentmana) end --小德界面初始化
 	end
-	if event == 'UNIT_POWER_UPDATE' and arg1 == 'player' then
+	if event == 'UNIT_POWER_UPDATE' then
 		local powerType = select(1, UnitPowerType('player'))
 		if powerType == 3 then
 			PowerSparkFrame:energy(PowerSparkDB.default)
@@ -40,14 +35,14 @@ function PowerSparkFrame:event(self, event, arg1)
 			PowerSparkFrame:mana(PowerSparkDB.druid, DruidBarKey.currentmana)
 		end
 	end
-end
-
-function PowerSparkFrame:update()
+end)
+PowerSparkFrame:SetScript('OnUpdate', function()
 	PowerSparkFrame:flash(PowerSparkDB.default)
 	if PowerSparkDB.druid.enable then PowerSparkFrame:flash(PowerSparkDB.druid) end
-end
+end)
 
 function PowerSparkFrame:init(power, last)
+	if power.bar then return end
 	power.bar = CreateFrame('Statusbar', power.name, power.parent)
 	power.bar:SetWidth(PlayerFrameManaBar:GetWidth() - 2)
 	power.bar:SetHeight(power.parent:GetHeight() - 2)
@@ -84,11 +79,13 @@ end
 
 function PowerSparkFrame:flash(power) --闪动
 	local powerType = select(1, UnitPowerType('player'))
-	if powerType == 1 and not power.enable then  --熊的怒气槽
+	if UnitIsDeadOrGhost('player') then
+		power.bar:Hide()
+	elseif powerType == 1 and not power.enable then  --熊的怒气槽
 		power.bar:Hide()
 	elseif powerType == 0 and UnitPower('player', 0) >= UnitPowerMax('player', 0) or power.enable and DruidBarKey.currentmana >= UnitPowerMax('player', 0) then --蓝条满
 		power.bar:Hide()
-	elseif powerType == 3 and UnitPower('player') >= UnitPowerMax('player') then
+	elseif powerType == 3 and not power.enable and UnitPower('player') >= UnitPowerMax('player') then
 		if UnitCanAttack('player', 'target') and not UnitIsDeadOrGhost('target') then --可攻击目标
 			power.bar:Show()
 		else
