@@ -29,9 +29,9 @@ PowerSparkFrame:SetScript('OnEvent', function(self, event)
 		if powerType == 3 then
 			PowerSparkFrame:energy(PowerSparkDB.default)
 		elseif powerType == 0 then
-			PowerSparkFrame:mana(PowerSparkDB.default, UnitPower('player', 0))
+			if not ChannelInfo() then PowerSparkFrame:mana(PowerSparkDB.default, UnitPower('player', 0)) end
 		end
-		if PowerSparkDB.druid.enable then
+		if PowerSparkDB.druid.enable and not ChannelInfo() then
 			PowerSparkFrame:mana(PowerSparkDB.druid, DruidBarKey.currentmana)
 		end
 	end
