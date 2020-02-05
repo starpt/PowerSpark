@@ -16,20 +16,25 @@ frame:SetScript('OnEvent', function(self, event, ...)
 			return cure, type
 		end
 		function self.wait(key)
-			if UnitPowerType('player') == 0 or key == 'druid' then self[key].wait = GetTime() + 5 end
+			local cure, type = self.cure(key)
+			if cure < self[key].cure and type == 0 then
+				self[key].wait = GetTime() + 5
+				self[key].cure = cure
+			end
 		end
 		function self.rest(key)
 			local cure, type = self.cure(key)
 			if type == 3 then self[key].wait = nil end
-			if cure > self[key].cure then self[key].timer = GetTime() end
-			self[key].cure = cure
+			if cure > self[key].cure then
+				self[key].timer = GetTime()
+				self[key].cure = cure
+			end
 		end
 		function self.init(parent, key) --初始化
 			if not parent then return end
 			local now = GetTime()
 			local type = UnitPowerType('player')
 			local power = CreateFrame('StatusBar', nil, parent)
-			--print(parent:GetWidth())
 			power:SetWidth(PlayerFrameManaBar:GetWidth())
 			power:SetHeight(parent:GetHeight())
 			power:SetPoint('CENTER')
