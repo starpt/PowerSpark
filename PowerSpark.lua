@@ -31,10 +31,10 @@ frame:SetScript('OnEvent', function(self, event, ...)
 			end
 		end
 		function self.init(parent, key) --初始化
-			if not parent then return end
+			if not parent or self[key] then return end
+			local power = CreateFrame('StatusBar', nil, parent)
 			local now = GetTime()
 			local type = UnitPowerType('player')
-			local power = CreateFrame('StatusBar', nil, parent)
 			power:SetWidth(PlayerFrameManaBar:GetWidth())
 			power:SetHeight(parent:GetHeight())
 			power:SetPoint('CENTER')
