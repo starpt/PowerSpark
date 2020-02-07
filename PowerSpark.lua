@@ -33,6 +33,7 @@ frame:SetScript('OnEvent', function(self, event, ...)
 		function self.init(parent, key) --初始化
 			if not parent or self[key] then return end
 			if not PowerSparkDB then PowerSparkDB = {[key] = {}} end
+			if not PowerSparkDB[key] then PowerSparkDB[key] = {} end
 			local power = CreateFrame('StatusBar', nil, parent)
 			local now = GetTime()
 			local type = UnitPowerType('player')
