@@ -1,6 +1,6 @@
 local class = select(2, UnitClass('player'))
 local frame = CreateFrame('Frame')
-for _, v in pairs({'PLAYER_ENTERING_WORLD', 'UNIT_SPELLCAST_SUCCEEDED', 'UNIT_MAXPOWER', 'UNIT_POWER_FREQUENT'}) do
+for _, v in pairs({'PLAYER_ENTERING_WORLD','PLAYER_LEAVING_WORLD', 'UNIT_SPELLCAST_SUCCEEDED', 'UNIT_MAXPOWER', 'UNIT_POWER_FREQUENT'}) do
 	frame:RegisterEvent(v, 'player')
 end
 if class == 'ROGUE' then frame:RegisterEvent('UNIT_AURA') end
@@ -15,10 +15,10 @@ frame:SetScript('OnEvent', function(self, event, ...)
 			end
 			return cure, type
 		end
-		function self.wait(key)
+		function self.cast(key)
 			local cure, type = self.cure(key)
-			if cure < self[key].cure and type == 0 then
-				self[key].wait = GetTime() + 5
+			if cure < self[key].cure then
+				if type == 0 then self[key].wait = GetTime() + 5 end
 				self[key].cure = cure
 			end
 		end
@@ -32,6 +32,7 @@ frame:SetScript('OnEvent', function(self, event, ...)
 		end
 		function self.init(parent, key) --初始化
 			if not parent or self[key] then return end
+			if not PowerSparkDB then PowerSparkDB = {[key] = {}} end
 			local power = CreateFrame('StatusBar', nil, parent)
 			local now = GetTime()
 			local type = UnitPowerType('player')
@@ -46,7 +47,7 @@ frame:SetScript('OnEvent', function(self, event, ...)
 			power.spark:SetAlpha(0)
 			power.rate = now
 			power.cure = UnitPower('player', type)
-			power.timer = now
+			power.timer = PowerSparkDB[key].timer
 			if key == 'DRUID' then power.cure = DruidBarKey.currentmana end
 			power.interval = 2
 			power.key = key
@@ -65,7 +66,7 @@ frame:SetScript('OnEvent', function(self, event, ...)
 				self.spark:SetAlpha(1)
 				if self.wait and self.wait > now then --5秒等待回蓝
 					self.spark:SetPoint('CENTER', self, 'LEFT', self:GetWidth() * (self.wait - now) / 5, 0)
-				else
+				elseif self.timer then
 					self.spark:SetPoint('CENTER', self, 'LEFT', self:GetWidth() * (mod(now - self.timer, self.interval) / self.interval), 0)
 				end
 			end)
@@ -73,9 +74,12 @@ frame:SetScript('OnEvent', function(self, event, ...)
 		end
 		self.init(PlayerFrameManaBar, 'default')
 		if class == 'DRUID' and DruidBarFrame and DruidBarKey then self.init(DruidBarFrame, 'druid') end
+	elseif event == 'PLAYER_LEAVING_WORLD' then
+		PowerSparkDB.default.timer = self.default.timer
+		if self.druid then PowerSparkDB.druid.timer = self.druid.timer end
 	elseif event == 'UNIT_SPELLCAST_SUCCEEDED' then
-		self.wait('default')
-		if self.druid then self.wait('druid') end
+		self.cast('default')
+		if self.druid then self.cast('druid') end
 	elseif event =='UNIT_MAXPOWER' or event == 'UNIT_POWER_FREQUENT' then
 		self.rest('default')
 		if self.druid then self.rest('druid') end
