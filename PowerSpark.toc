@@ -1,9 +1,13 @@
-## Interface: 11303
-## Title: 能量和法力恢复提示
-## Notes: PowerSpark
-## Version: 1.2.9
-## Author: 星沉海底
-## X-Website: https://github.com/starpt
+## Interface: 11506
+## Title: PowerSpark
+## Notes: 能量和法力恢复提示
+
+## Version: 1.15.1
+## X-Localizations: enUS, zhCN
+## Author: starpt
+## X-Website: https://www.curseforge.com/wow/addons/powerspark
 ## X-eMail: starpt@gmail.com
+
 ## SavedVariablesPerCharacter: PowerSparkDB
+
 PowerSpark.lua
