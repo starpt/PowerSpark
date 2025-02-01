@@ -1,7 +1,15 @@
 local playerClass = select(2, UnitClass('player'))
 if playerClass == 'WARRIOR' then return end -- 战士不需要
 
-PowerSparkDB = PowerSparkDB or {}
+PowerSparkDB = PowerSparkDB or {
+	enabled = true,
+	DruidBarFrame = true,
+	SUF = true,
+	ElvUI = true,
+	Statusbars2 = true,
+	maxManaHide = true,
+	maxEnergyHide = true,
+}
 local frame = CreateFrame('Frame')
 
 -- 初始化
@@ -12,16 +20,24 @@ function frame:init(bar, powerType)
 	bar.spark:SetTexture('Interface\\CastingBar\\UI-CastingBar-Spark')
 	bar.spark:SetBlendMode('ADD')
 	bar.spark:SetSize(28, 28)
+
 	bar:HookScript('OnUpdate', function(self)
 		local now = GetTime()
 		if self.rate and now < self.rate then return end
 		self.rate = now + .02 --刷新率
 		local powerType = self.powerType or UnitPowerType('player')
-		if UnitIsDeadOrGhost('player') or powerType ~= 0 and powerType ~= 3 or not InCombatLockdown() and UnitPower('player', powerType) >= UnitPowerMax('player', powerType) and (powerType == 0 or not IsStealthed() and not UnitCanAttack('player', 'target')) then
+
+		if UnitIsDeadOrGhost('player') or
+			powerType ~= 0 and powerType ~= 3 or
+			not InCombatLockdown() and UnitPower('player', powerType) >= UnitPowerMax('player', powerType) and (
+				powerType == 0 and PowerSparkDB.maxManaHide or
+				powerType == 3 and not IsStealthed() and not UnitCanAttack('player', 'target') and PowerSparkDB.maxEnergyHide
+			) then
 			self.spark:Hide()
 			return
 		end
 		self.spark:Show()
+
 		local interval = frame.interval or 2 -- 恢复间隔
 		local width = self:GetWidth()
 		if powerType == 0 then
@@ -50,26 +66,27 @@ end
 frame:SetScript('OnEvent', function(self, event, unit)
 	local now = GetTime()
 	if event == 'PLAYER_ENTERING_WORLD' then
-		if UnitPowerType('player') == 0 or playerClass == 'DRUID' then -- 法力
-			self.lastMana = UnitPower('player', 0)
-			PowerSparkDB.manaTime = type(PowerSparkDB.manaTime) == 'number' and now > PowerSparkDB.manaTime and PowerSparkDB.manaTime or now
-		end
-		if UnitPowerType('player') == 3 or playerClass == 'DRUID' then -- 能量
-			self.lastEnergy = UnitPower('player', 3)
-			PowerSparkDB.energyTime = type(PowerSparkDB.energyTime) == 'number' and now > PowerSparkDB.energyTime and PowerSparkDB.energyTime or now
-		end
+		if PowerSparkDB.enabled then
+			if UnitPowerType('player') == 0 or playerClass == 'DRUID' then -- 法力
+				self.lastMana = UnitPower('player', 0)
+				PowerSparkDB.manaTime = type(PowerSparkDB.manaTime) == 'number' and now > PowerSparkDB.manaTime and PowerSparkDB.manaTime or now
+			end
+			if UnitPowerType('player') == 3 or playerClass == 'DRUID' then -- 能量
+				self.lastEnergy = UnitPower('player', 3)
+				PowerSparkDB.energyTime = type(PowerSparkDB.energyTime) == 'number' and now > PowerSparkDB.energyTime and PowerSparkDB.energyTime or now
+			end
 
-		self:init(PlayerFrameManaBar)
-		if playerClass == 'DRUID' then
-			self:init(PlayerFrame.druidBar, 0)
-			self:init(DruidBarFrame, 0) -- 兼容DruidBarFrame
+			self:init(PlayerFrameManaBar)
+			if playerClass == 'DRUID' and PowerSparkDB.DruidBarFrame then self:init(DruidBarFrame, 0) end -- 兼容DruidBarFrame
+			if ElvUF_Player and PowerSparkDB.ElvUI then self:init(ElvUF_Player.Power) end -- 兼容 ElvUI
+			if PowerSparkDB.Statusbars2 then self:init(StatusBars2_playerPowerBar) end -- 兼容 Statusbars2
+
+			-- 兼容 SUF
+			if SUFUnitplayer and PowerSparkDB.SUF then
+				self:init(SUFUnitplayer.powerBar)
+				if playerClass == 'DRUID' then self:init(SUFUnitplayer.druidBar, 0) end
+			end
 		end
-		if SUFUnitplayer then -- 兼容 SUF
-			self:init(SUFUnitplayer.powerBar)
-			if playerClass == 'DRUID' then self:init(SUFUnitplayer.druidBar, 0) end
-		end
-		if ElvUF_Player then self:init(ElvUF_Player.Power) end -- 兼容 ElvUI
-		self:init(StatusBars2_playerPowerBar) -- 兼容 Statusbars2
 	elseif event == 'COMBAT_LOG_EVENT_UNFILTERED' then
 		local guid = UnitGUID('player')
 		local _, subevent, _, sourceGUID, _, _, _, destGUID, _, _, _, spellId = CombatLogGetCurrentEventInfo()
