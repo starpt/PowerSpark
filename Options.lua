@@ -32,6 +32,35 @@ if GetLocale() == 'zhCN' then
 	L.ElvUI = '支持 ElvUI 插件能力条'
 end
 
+function option:init()
+	local playerClass = select(2, UnitClass('player'))
+	self.enabled:SetChecked(PowerSparkDB.enabled and playerClass ~= 'WARRIOR')
+	self.enabled:SetEnabled(playerClass ~= 'WARRIOR')
+
+	self.maxManaHide:SetChecked(PowerSparkDB.maxManaHide and playerClass ~= 'WARRIOR' and playerClass ~= 'ROGUE')
+	self.maxManaHide:SetEnabled(PowerSparkDB.enabled and playerClass ~= 'WARRIOR' and playerClass ~= 'ROGUE')
+
+	self.maxEnergyHide:SetChecked(PowerSparkDB.maxEnergyHide and (playerClass == 'DRUID' or playerClass == 'ROGUE'))
+	self.maxEnergyHide:SetEnabled(PowerSparkDB.enabled and (playerClass == 'DRUID' or playerClass == 'ROGUE'))
+
+	self.DruidBarFrame:SetChecked(PowerSparkDB.DruidBarFrame and playerClass == 'DRUID' and DruidBarFrame)
+	self.DruidBarFrame:SetEnabled(PowerSparkDB.enabled and playerClass == 'DRUID' and DruidBarFrame)
+
+	self.ElvUI:SetChecked(PowerSparkDB.ElvUI and ElvUF_Player)
+	self.ElvUI:SetEnabled(PowerSparkDB.enabled and ElvUF_Player)
+
+	self.Statusbars2:SetChecked(PowerSparkDB.Statusbars2 and StatusBars2_playerPowerBar)
+	self.Statusbars2:SetEnabled(PowerSparkDB.enabled and StatusBars2_playerPowerBar)
+
+	self.SUF:SetChecked(PowerSparkDB.SUF and SUFUnitplayer)
+	self.SUF:SetEnabled(PowerSparkDB.enabled and SUFUnitplayer)
+end
+
+option:RegisterEvent('VARIABLES_LOADED')
+option:SetScript('OnEvent', function(self, event)
+	if event == 'VARIABLES_LOADED' then self:init() end
+end)
+
 -- 确认
 function option.comfing()
 	local comfing = _G[addonName .. 'Comfing']
@@ -96,31 +125,6 @@ function option:check(name, comfing, relative, offsetX, offsetY)
 		end
 	end)
 end
-
-function option:init()
-	local playerClass = select(2, UnitClass('player'))
-	self.enabled:SetChecked(PowerSparkDB.enabled and playerClass ~= 'WARRIOR')
-	self.enabled:SetEnabled(playerClass ~= 'WARRIOR')
-
-	self.maxManaHide:SetChecked(PowerSparkDB.maxManaHide and playerClass ~= 'WARRIOR' and playerClass ~= 'ROGUE')
-	self.maxManaHide:SetEnabled(PowerSparkDB.enabled and playerClass ~= 'WARRIOR' and playerClass ~= 'ROGUE')
-
-	self.maxEnergyHide:SetChecked(PowerSparkDB.maxEnergyHide and (playerClass == 'DRUID' or playerClass == 'ROGUE'))
-	self.maxEnergyHide:SetEnabled(PowerSparkDB.enabled and (playerClass == 'DRUID' or playerClass == 'ROGUE'))
-
-	self.DruidBarFrame:SetChecked(PowerSparkDB.DruidBarFrame and playerClass == 'DRUID' and DruidBarFrame)
-	self.DruidBarFrame:SetEnabled(PowerSparkDB.enabled and playerClass == 'DRUID' and DruidBarFrame)
-
-	self.ElvUI:SetChecked(PowerSparkDB.ElvUI and ElvUF_Player)
-	self.ElvUI:SetEnabled(PowerSparkDB.enabled and ElvUF_Player)
-
-	self.Statusbars2:SetChecked(PowerSparkDB.Statusbars2 and StatusBars2_playerPowerBar)
-	self.Statusbars2:SetEnabled(PowerSparkDB.enabled and StatusBars2_playerPowerBar)
-
-	self.SUF:SetChecked(PowerSparkDB.SUF and SUFUnitplayer)
-	self.SUF:SetEnabled(PowerSparkDB.enabled and SUFUnitplayer)
-end
-option:SetScript('OnShow', option.init)
 
 option.title = option:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
 option.title:SetPoint('TOPLEFT', 16, -16)

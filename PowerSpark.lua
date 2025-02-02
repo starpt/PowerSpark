@@ -14,12 +14,15 @@ local frame = CreateFrame('Frame')
 
 -- 初始化
 function frame:init(bar, powerType)
-	if not bar or bar.spark then return end
-	if powerType then bar.powerType = powerType end
-	bar.spark = bar:CreateTexture(nil, 'OVERLAY')
-	bar.spark:SetTexture('Interface\\CastingBar\\UI-CastingBar-Spark')
-	bar.spark:SetBlendMode('ADD')
-	bar.spark:SetSize(28, 28)
+	if not bar then return end
+	if not bar.spark then
+		bar.spark = bar:CreateTexture(nil, 'OVERLAY')
+		bar.spark:SetTexture('Interface\\CastingBar\\UI-CastingBar-Spark')
+		bar.spark:SetBlendMode('ADD')
+		bar.spark:SetSize(28, 28)
+		bar.spark:SetAlpha(.8)
+		if powerType then bar.powerType = powerType end
+	end
 
 	bar:HookScript('OnUpdate', function(self)
 		local now = GetTime()
