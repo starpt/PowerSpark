@@ -39,22 +39,14 @@ function frame:init(bar, powerType)
 			self.spark:Hide()
 			return
 		end
-		self.spark:Show()
 
 		local interval = frame.interval or 2 -- 恢复间隔
-		local width = self:GetWidth()
-		if powerType == 0 then
-			if type(frame.waitTime) == 'number' and frame.waitTime > now then
-				self.spark:SetPoint('CENTER', self, 'LEFT', width * (frame.waitTime - now) / 5, 0)
-			elseif type(PowerSparkDB.manaTime) == 'number' and now > PowerSparkDB.manaTime then
-				self.spark:SetPoint('CENTER', self, 'LEFT', width * (mod(now - PowerSparkDB.manaTime, interval) / interval), 0)
-			else
-				bar.spark:Hide()
-			end
-		elseif powerType == 3 then
-			if type(PowerSparkDB.energyTime) == 'number' and now > PowerSparkDB.energyTime then
-				self.spark:SetPoint('CENTER', self, 'LEFT', width * (mod(now - PowerSparkDB.energyTime, interval) / interval), 0)
-			end
+		if powerType == 0 and type(frame.waitTime) == 'number' and frame.waitTime > now then
+			self.spark:Show()
+			self.spark:SetPoint('CENTER', self, 'LEFT', self:GetWidth() * (frame.waitTime - now) / 5, 0)
+		elseif type(frame.sparkTime) == 'number' and now > frame.sparkTime then
+			self.spark:Show()
+			self.spark:SetPoint('CENTER', self, 'LEFT', self:GetWidth() * (mod(now - frame.sparkTime, interval) / interval), 0)
 		end
 	end)
 end
@@ -66,21 +58,21 @@ for _, event in pairs({
 }) do
 	frame:RegisterEvent(event)
 end
-frame:SetScript('OnEvent', function(self, event, unit)
+frame:SetScript('OnEvent', function(self, event, unit, powerType)
 	local now = GetTime()
 	if event == 'PLAYER_ENTERING_WORLD' then
 		if PowerSparkDB.enabled then
 			if UnitPowerType('player') == 0 or playerClass == 'DRUID' then -- 法力
 				self.lastMana = UnitPower('player', 0)
-				PowerSparkDB.manaTime = type(PowerSparkDB.manaTime) == 'number' and now > PowerSparkDB.manaTime and PowerSparkDB.manaTime or now
 			end
-			if UnitPowerType('player') == 3 or playerClass == 'DRUID' then -- 能量
+			if UnitPowerType('player') == 3 then -- 能量
 				self.lastEnergy = UnitPower('player', 3)
-				PowerSparkDB.energyTime = type(PowerSparkDB.energyTime) == 'number' and now > PowerSparkDB.energyTime and PowerSparkDB.energyTime or now
 			end
+			self.sparkTime = now
 
 			self:init(PlayerFrameManaBar)
-			if playerClass == 'DRUID' and PowerSparkDB.DruidBarFrame then self:init(DruidBarFrame, 0) end -- 兼容DruidBarFrame
+			self:init(PlayerFrameDruidBar) -- 兼容 BiechuUnitFrames 德鲁伊法力条
+			if playerClass == 'DRUID' and PowerSparkDB.DruidBarFrame then self:init(DruidBarFrame, 0) end -- 兼容 DruidBarFrame
 			if ElvUF_Player and PowerSparkDB.ElvUI then self:init(ElvUF_Player.Power) end -- 兼容 ElvUI
 			if PowerSparkDB.Statusbars2 then self:init(StatusBars2_playerPowerBar) end -- 兼容 Statusbars2
 
@@ -114,22 +106,27 @@ frame:SetScript('OnEvent', function(self, event, unit)
 		if unit == 'player' then
 			if UnitPowerType('player') == 0 or playerClass == 'DRUID' then -- 法力
 				local mana = UnitPower('player', 0)
-				if not self.ignore and type(self.lastMana) == 'number' and mana < self.lastMana then
+				if not self.ignore and type(self.lastMana) == 'number' and mana < self.lastMana and mana < UnitPowerMax('player', 0) then
 					self.waitTime = now + 5
 				elseif type(self.lastMana) == 'number' and mana > self.lastMana then -- 法力增加
-					if self.skip then -- 跳过非2秒回蓝, 比如 生命分流
+					if self.skip then -- 跳过非2秒回蓝, 比如 法力药水 生命分流
 						self.skip = nil
 					else
+						self.sparkTime = now
 						self.waitTime = nil
-						PowerSparkDB.manaTime = now
 					end
 				end
 				self.lastMana = mana
 			end
-			if UnitPowerType('player') == 3 or playerClass == 'DRUID' then -- 能量
+
+			if UnitPowerType('player') == 3 then -- 能量
 				local energy = UnitPower('player', 3)
-				if type(self.lastEnergy) ~= 'number' or energy > self.lastEnergy then
-					PowerSparkDB.energyTime = now
+				if type(self.lastEnergy) == 'number' and energy > self.lastEnergy then -- 能量增加
+					if self.skip then -- 跳过 如菊花茶
+						self.skip = nil
+					else
+						self.sparkTime = now
+					end
 				end
 				self.lastEnergy = UnitPower('player', 3)
 			end
