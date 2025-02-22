@@ -3,7 +3,7 @@
 ## Notes: Energy and Mana recovery spark
 ## Notes-zhCN: 能量和法力恢复闪动
 
-## Version: 1.15.4
+## Version: 1.15.5
 ## X-Localizations: enUS, zhCN
 ## Author: starpt
 ## X-Website: https://www.curseforge.com/wow/addons/powerspark
