@@ -1,6 +1,3 @@
-local playerClass = select(2, UnitClass('player'))
-if playerClass == 'WARRIOR' then return end -- 战士不需要
-
 PowerSparkDB = PowerSparkDB or {
 	enabled = true,
 	DruidBarFrame = true,
@@ -10,6 +7,8 @@ PowerSparkDB = PowerSparkDB or {
 	maxManaHide = true,
 	maxEnergyHide = true,
 }
+local playerClass = select(2, UnitClass('player'))
+if playerClass == 'WARRIOR' then return end -- 战士不需要
 local frame = CreateFrame('Frame')
 
 -- 初始化
