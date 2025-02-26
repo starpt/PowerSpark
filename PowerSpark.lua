@@ -50,9 +50,10 @@ function frame:init(bar, powerType)
 end
 
 for _, event in pairs({
-	'PLAYER_ENTERING_WORLD',
-	'COMBAT_LOG_EVENT_UNFILTERED',
-	'UNIT_POWER_UPDATE',
+	'PLAYER_ENTERING_WORLD', -- 进入世界
+	'COMBAT_LOG_EVENT_UNFILTERED', -- 战斗日志
+	'ACTIVE_TALENT_GROUP_CHANGED', -- 天赋切换
+	'UNIT_POWER_UPDATE', -- 法力/能量值变化
 }) do
 	frame:RegisterEvent(event)
 end
@@ -103,6 +104,8 @@ frame:SetScript('OnEvent', function(self, event, unit)
 				self.skip = powerType
 			end
 		end
+	elseif event == 'ACTIVE_TALENT_GROUP_CHANGED' then
+		self.skip = 0
 	elseif event == 'UNIT_POWER_UPDATE' then
 		if unit == 'player' then
 			if UnitPowerType('player') == 0 or playerClass == 'DRUID' then -- 法力
