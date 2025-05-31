@@ -33,6 +33,18 @@ if GetLocale() == 'zhCN' then
 	L.ElvUI = '支持 ElvUI 插件能力条'
 	L.ReloadUI = '重新加载UI'
 end
+if GetLocale() == 'ruRU' then
+	L.comfing = 'Требуется перезагрузка интерфейса для применения изменений!'
+	L.info = 'Электронная почта: ' .. GetAddOnMetadata(addonName, 'X-eMail')
+	L.enabled = 'Включено ' .. addonName
+	L.maxManaHide = 'Скрывать вне боя при полной мане'
+	L.maxEnergyHide = 'Скрывать вне боя при полной энергии, если не в скрытности/подкрадывании или нет цели для атаки'
+	L.DruidBarFrame = 'Поддержка дополнительной полосы маны друида из аддона DruidBarFrame'
+	L.SUF = 'Поддержка полосы энергии и полосы маны друида из аддона Shadowed Unit Frames'
+	L.Statusbars2 = 'Поддержка полосы энергии из аддона Statusbars2'
+	L.ElvUI = 'Поддержка полосы энергии из аддона ElvUI'
+	L.ReloadUI = 'Перезагрузить интерфейс'
+end
 
 function option:init()
 	local playerClass = select(2, UnitClass('player'))
