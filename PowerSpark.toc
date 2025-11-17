@@ -1,10 +1,11 @@
-## Interface: 11507
+## Interface: 11508
 ## Title: PowerSpark
 ## Notes: Energy and Mana recovery spark
 ## Notes-zhCN: 能量和法力恢复闪动
+## Notes-ruRU: Восстановление энергии и маны мерцанием
 
-## Version: 1.15.7
-## X-Localizations: enUS, zhCN
+## Version: 1.15.8
+## X-Localizations: enUS, zhCN, ruRU
 ## Author: starpt
 ## X-Website: https://www.curseforge.com/wow/addons/powerspark
 ## X-eMail: starpt@gmail.com
