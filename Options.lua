@@ -32,8 +32,7 @@ if GetLocale() == 'zhCN' then
 	L.Statusbars2 = '支持 Statusbars2 插件能量条'
 	L.ElvUI = '支持 ElvUI 插件能力条'
 	L.ReloadUI = '重新加载UI'
-end
-if GetLocale() == 'ruRU' then
+elseif GetLocale() == 'ruRU' then
 	L.comfing = 'Требуется перезагрузка интерфейса для применения изменений!'
 	L.info = 'Электронная почта: ' .. GetAddOnMetadata(addonName, 'X-eMail')
 	L.enabled = 'Включено ' .. addonName
