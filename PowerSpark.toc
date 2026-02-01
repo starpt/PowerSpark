@@ -5,12 +5,15 @@
 ## Notes-ruRU: Восстановление энергии и маны мерцанием
 
 ## Version: 1.16.0
-## X-Localizations: enUS, zhCN, ruRU
 ## Author: starpt
+## IconTexture: Interface\AddOns\PowerSpark\Logo
+## SavedVariablesPerCharacter: PowerSparkDB
+
+## X-Localizations: enUS, ruRU, zhCN
 ## X-Website: http://github.com/starpt/powerspark
 ## X-eMail: starpt@gmail.com
 
-## SavedVariablesPerCharacter: PowerSparkDB
+
 
 PowerSpark.lua
 
