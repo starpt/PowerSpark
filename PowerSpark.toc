@@ -12,6 +12,7 @@
 ## X-Localizations: enUS, ruRU, zhCN
 ## X-Website: http://github.com/starpt/powerspark
 ## X-eMail: starpt@gmail.com
+## X-LoadOn-Slash: /ps
 
 PowerSpark.lua
 Options.lua
