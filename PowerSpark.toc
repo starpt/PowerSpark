@@ -1,8 +1,8 @@
 ## Interface: 11508, 20505
 ## Title: PowerSpark
 ## Notes: Energy and Mana recovery spark
-## Notes-zhCN: 能量和法力恢复闪动
 ## Notes-ruRU: Восстановление энергии и маны мерцанием
+## Notes-zhCN: 能量和法力恢复闪动
 
 ## Version: 1.16.0
 ## Author: starpt
@@ -13,9 +13,5 @@
 ## X-Website: http://github.com/starpt/powerspark
 ## X-eMail: starpt@gmail.com
 
-
-
 PowerSpark.lua
-
-# 设置(设置完成后可以禁用)
 Options.lua
