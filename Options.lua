@@ -2,6 +2,7 @@ local addonName = ...
 local option = CreateFrame('Frame', addonName .. 'Option')
 local category = Settings.RegisterCanvasLayoutCategory(option, addonName)
 Settings.RegisterAddOnCategory(category)
+local GetAddOnMetadata = GetAddOnMetadata or C_AddOns.GetAddOnMetadata
 
 -- 命令行
 SlashCmdList[addonName] = function()
@@ -11,7 +12,7 @@ _G['SLASH_' .. addonName .. '1'] = '/ps'
 
 local L = {
 	comfing = 'Need to Reload UI!',
-	info = 'Email: ' .. C_AddOns.GetAddOnMetadata(addonName, 'X-eMail'),
+	info = 'Email: ' .. GetAddOnMetadata(addonName, 'X-eMail'),
 	enabled = 'Enabled ' .. addonName,
 	maxManaHide = 'Hide when mana is full',
 	maxEnergyHide = 'Hide when energy is full',
@@ -34,7 +35,7 @@ if GetLocale() == 'zhCN' then
 	L.ReloadUI = '重新加载UI'
 elseif GetLocale() == 'ruRU' then
 	L.comfing = 'Требуется перезагрузка интерфейса для применения изменений!'
-	L.info = 'Электронная почта: ' .. C_AddOns.GetAddOnMetadata(addonName, 'X-eMail')
+	L.info = 'Электронная почта: ' .. GetAddOnMetadata(addonName, 'X-eMail')
 	L.enabled = 'Включено ' .. addonName
 	L.maxManaHide = 'Скрывать вне боя при полной мане'
 	L.maxEnergyHide = 'Скрывать вне боя при полной энергии, если не в скрытности/подкрадывании или нет цели для атаки'
@@ -99,7 +100,7 @@ end
 
 option.title = option:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
 option.title:SetPoint('TOPLEFT', 16, -16)
-option.title:SetText(addonName .. ' v' .. C_AddOns.GetAddOnMetadata(addonName, 'Version'))
+option.title:SetText(addonName .. ' v' .. GetAddOnMetadata(addonName, 'Version'))
 option.info = option:CreateFontString(option:GetName() .. 'Info', 'ARTWORK', 'SystemFont_Small')
 option.info:SetPoint('TOPLEFT', 17, -36)
 option.info:SetTextColor(.7, .7, .7)
