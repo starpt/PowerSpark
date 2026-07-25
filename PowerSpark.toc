@@ -1,10 +1,10 @@
-## Interface: 11508, 20505
+## Interface: 11509, 20506
 ## Title: PowerSpark
 ## Notes: Energy and Mana recovery spark
 ## Notes-ruRU: Восстановление энергии и маны мерцанием
 ## Notes-zhCN: 能量和法力恢复闪动
 
-## Version: 1.16.1
+## Version: 1.16.2
 ## Author: starpt
 ## SavedVariablesPerCharacter: PowerSparkDB
 ## IconTexture: Interface\AddOns\PowerSpark\Logo
